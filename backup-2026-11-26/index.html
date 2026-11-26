@@ -1,0 +1,532 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>ติดตามงานออกแบบ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style id="app-style">
+/* Layout: an open, unboxed header (light-weight title, underline search, hairline stat row), a plain-text stage row,
+   then quiet hairline cards. Ink on near-white with one champagne accent used only for the current stage and small marks.
+   The stitched thread stays: solid ink where work is done, dashed hairline where it is still to come. */
+:root{
+  --bg:#f7f7f8; --surface:#ffffff; --fg:#111113; --muted:#6b6b74; --line:#e5e5ea; --line-strong:#cfcfd8;
+  --gold:#b08d57; --gold-ink:#7d5e26; --ok:#1f7a5a; --danger:#b42318;
+  --font:"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;
+  --display:"Prompt","IBM Plex Sans Thai",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c0c0e; --surface:#151518; --fg:#f2f2f4; --muted:#8e8e99; --line:#26262c; --line-strong:#3b3b44;
+  --gold:#c9a96e; --gold-ink:#d9bd86; --ok:#4cc29a; --danger:#ff8a80; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c0c0e; --surface:#151518; --fg:#f2f2f4; --muted:#8e8e99; --line:#26262c; --line-strong:#3b3b44;
+  --gold:#c9a96e; --gold-ink:#d9bd86; --ok:#4cc29a; --danger:#ff8a80; color-scheme:dark}
+
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.6;
+  padding-block:40px 80px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+*{box-sizing:border-box}
+#root{max-width:720px;margin:0 auto;display:grid;gap:34px}
+
+.brand{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand-l{display:flex;align-items:center;gap:12px;min-width:0}
+.brand-t{display:grid;line-height:1.3}
+.brand-t b{font-family:var(--display);font-weight:500;font-size:1.05rem}
+.brand-t span{font-size:.75rem;color:var(--muted)}
+.avatar{flex:none;border-radius:50%;box-shadow:0 0 0 1px var(--gold)}
+.av-bg{fill:color-mix(in srgb,var(--gold) 24%,var(--surface))}
+.call{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line-strong);border-radius:99px;padding:7px 16px;color:var(--fg);text-decoration:none;font-size:.9rem;font-weight:500;letter-spacing:.02em;font-variant-numeric:tabular-nums}
+.call:hover{border-color:var(--fg)}
+.call svg{color:var(--gold-ink);flex:none}
+.signoff{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px}
+.signoff-t{display:grid;gap:8px;justify-items:start;min-width:0}
+.signoff-t b{font-family:var(--display);font-weight:500;font-size:1.05rem}
+.bubble{margin:0;padding:10px 14px;border:1px solid var(--line-strong);border-radius:14px 14px 14px 4px;font-size:.92rem}
+/* header */
+.hero{position:relative;display:grid;gap:18px}
+.hero::after{content:"";position:absolute;right:0;top:-6px;width:92px;height:92px;border-radius:50%;border:1px dashed var(--line-strong);pointer-events:none}
+.hero-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:.78rem;font-weight:500;letter-spacing:.08em;color:var(--gold-ink)}
+.eyebrow::before{content:"";width:24px;height:1px;background:var(--gold)}
+.owner{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:500;letter-spacing:.04em;padding:2px 10px;border-radius:99px;border:1px solid var(--gold);color:var(--gold-ink)}
+h1{font-family:var(--display);font-size:clamp(2.2rem,8vw,3.3rem);line-height:1.15;margin:0;font-weight:300;letter-spacing:-.01em;text-wrap:balance}
+.sub{margin:0;color:var(--muted);max-width:42ch}
+.hero .hsearch{width:100%;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%238e8e99' stroke-width='1.6' stroke-linecap='round'%3E%3Ccircle cx='8' cy='8' r='5.5'/%3E%3Cpath d='m12.5 12.5 3.5 3.5'/%3E%3C/svg%3E") no-repeat 2px 50%;
+  border:0;border-bottom:1px solid var(--line-strong);border-radius:0;color:var(--fg);padding:12px 0 12px 30px;font-size:1rem;min-width:0}
+.hero .hsearch::placeholder{color:var(--muted)}
+.hero .hsearch:focus{border-bottom-color:var(--fg)}
+.hero .hsearch:focus-visible{outline:2px solid var(--fg);outline-offset:4px;border-radius:2px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:6px}
+.stat{padding:18px 8px 16px 0;min-width:0}
+.stat + .stat{padding-left:16px;border-left:1px solid var(--line)}
+.stat b{display:block;font-family:var(--display);font-size:2.4rem;line-height:1.1;font-weight:300;font-variant-numeric:tabular-nums}
+.stat b.warn{color:var(--danger)}
+.stat span{display:flex;align-items:center;gap:6px;font-size:.78rem;letter-spacing:.03em;color:var(--muted);margin-top:6px}
+.stat span svg{flex:none}
+
+/* stage row */
+.sec{display:grid;gap:12px}
+.sec h2{margin:0;font-size:.74rem;font-weight:500;letter-spacing:.08em;color:var(--muted)}
+.chips{display:flex;gap:26px;overflow-x:auto;border-bottom:1px solid var(--line);scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;display:flex;flex-direction:row-reverse;justify-content:flex-end;align-items:baseline;gap:8px;
+  font:inherit;background:none;border:0;border-radius:0;padding:10px 0 13px;cursor:pointer;color:var(--muted)}
+.chip span{font-size:.9rem}
+.chip b{font-family:var(--display);font-size:.82rem;font-weight:500;font-variant-numeric:tabular-nums;color:var(--muted);opacity:.7}
+.chip.has{color:var(--fg)}
+.chip.has b{color:var(--gold-ink);opacity:1}
+.chip[aria-pressed="true"]{color:var(--fg);box-shadow:inset 0 -2px 0 var(--fg)}
+.chip svg{flex:none;align-self:center;color:var(--muted)}
+.chip.has svg{color:var(--gold-ink)}
+.chip[aria-pressed="true"] svg{color:var(--fg)}
+
+.tabs{display:flex;gap:24px;justify-self:start}
+.tabs button{font:inherit;font-size:.92rem;background:none;border:0;border-bottom:1px solid transparent;border-radius:0;padding:4px 0;color:var(--muted);cursor:pointer}
+.tabs button[aria-pressed="true"]{color:var(--fg);font-weight:500;border-bottom-color:var(--gold)}
+:focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+
+/* cards */
+.list{display:grid;gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 22px 18px;display:grid;gap:14px;min-width:0}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.code{font-family:var(--mono);font-weight:500;font-size:.78rem;letter-spacing:.08em;color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:3px 12px;border-radius:99px;border:1px solid var(--line-strong);background:transparent;color:var(--fg);font-size:.78rem;font-weight:500;white-space:nowrap}
+.pill svg{flex:none;color:var(--gold-ink)}
+.card.s7 .pill svg{color:var(--ok)}
+.pill.late{border-color:color-mix(in srgb,var(--danger) 45%,var(--line));color:var(--danger)}
+.pill.late svg{color:var(--danger)}
+.who{font-family:var(--display);font-weight:500;font-size:1.2rem;line-height:1.35;letter-spacing:-.005em;overflow-wrap:anywhere}
+.item{color:var(--muted);overflow-wrap:anywhere;margin-top:-10px}
+.badge{font-size:.7rem;font-weight:500;padding:1px 9px;border-radius:6px;border:1px dashed var(--line-strong);color:var(--muted);background:transparent;white-space:nowrap}
+
+.steps{display:grid;grid-template-columns:repeat(7,1fr);padding-top:4px}
+.step{position:relative;display:grid;justify-items:center;align-content:start;gap:8px;min-width:0}
+.step::before{content:"";position:absolute;top:13px;right:50%;width:100%;border-top:1px dashed var(--line-strong)}
+.step:first-child::before{display:none}
+.dot{position:relative;z-index:1;width:28px;height:28px;border-radius:50%;background:var(--surface);border:1px solid var(--line-strong);display:grid;place-items:center;font-size:.6rem;font-weight:500;color:var(--muted)}
+.lbl{font-size:.68rem;line-height:1.3;color:var(--muted);text-align:center;overflow-wrap:anywhere}
+.step.done::before,.step.now::before{border-top:1.5px solid var(--fg)}
+.step.done .dot{background:var(--fg);border-color:var(--fg);color:var(--surface)}
+.step.now .dot{background:var(--gold);border-color:var(--gold);color:#1a1306;box-shadow:0 0 0 4px color-mix(in srgb,var(--gold) 22%,transparent)}
+.step.now .lbl{color:var(--fg);font-weight:600}
+
+.hint{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.88rem}
+.turn{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:500;letter-spacing:.04em;padding:2px 10px;border-radius:99px;border:1px solid var(--line-strong);color:var(--muted);white-space:nowrap}
+.turn.cust{border-color:var(--gold);color:var(--gold-ink);background:color-mix(in srgb,var(--gold) 10%,var(--surface))}
+.meta{display:flex;gap:6px 16px;flex-wrap:wrap;align-items:center;font-size:.8rem;color:var(--muted)}
+.meta .due{font-weight:500;color:var(--fg)}
+.meta > span{display:inline-flex;align-items:center;gap:6px}
+.meta svg{flex:none}
+
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.thumbs.one{grid-template-columns:1fr}
+.thumbs.one .thumb{aspect-ratio:16/10;max-height:420px}
+.thumb{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--bg);max-width:100%}
+.thumb .open{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:none;cursor:zoom-in}
+.thumb img{width:100%;height:100%;object-fit:contain;display:block}
+.thumb .x{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:99px;border:0;background:rgba(0,0,0,.65);color:#fff;cursor:pointer;line-height:1;font-size:17px;padding:0}
+.lightbox{position:fixed;inset:0;background:rgba(8,8,10,.94);display:grid;place-items:center;padding:56px 16px 16px;z-index:50}
+.lightbox img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px}
+.lightbox button{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:max(12px,env(safe-area-inset-right,0px));background:#fff;color:#111113;border:0;border-radius:99px;padding:7px 18px;cursor:pointer;font-weight:500}
+
+/* owner controls + form */
+.actions{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:.88rem;font-weight:500;border:1px solid var(--line-strong);background:transparent;color:var(--fg);border-radius:10px;padding:8px 16px;cursor:pointer}
+.btn:hover{border-color:var(--fg)}
+.btn.primary{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn.danger{color:var(--danger);border-color:transparent;margin-left:auto}
+.btn.danger.sure{background:var(--danger);color:#fff;border-color:var(--danger)}
+.form{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;display:grid;gap:14px}
+.form h2{margin:0;font-family:var(--display);font-size:1.05rem;font-weight:500}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+label{display:grid;gap:5px;font-size:.75rem;font-weight:500;letter-spacing:.03em;color:var(--muted);min-width:0}
+input[type=text],input[type=date]{font:inherit;font-size:.95rem;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0;width:100%}
+input[type=text]:focus,input[type=date]:focus{border-color:var(--fg)}
+input[type=file]{font:inherit;font-size:.85rem;color:var(--muted);max-width:100%;min-width:0}
+.empty{display:grid;justify-items:center;gap:10px;color:var(--muted);text-align:center;padding:40px 16px;border:1px dashed var(--line-strong);border-radius:16px}
+.empty p{margin:0}
+.note{font-size:.78rem;color:var(--muted);margin:0}
+#saving{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:99px;font-size:.82rem;font-weight:500;z-index:60}
+
+@media (prefers-reduced-motion:no-preference){
+  .card{transition:border-color .2s ease}
+  .card:hover{border-color:var(--line-strong)}
+}
+@media (max-width:480px){
+  body{padding-block:28px 64px}
+  .stat{padding:14px 4px 12px 0}
+  .stat + .stat{padding-left:12px}
+  .stat b{font-size:1.9rem}
+  .stat span{font-size:.72rem;gap:5px;flex-direction:column;align-items:flex-start}
+  .stat span svg{width:13px;height:13px}
+  .lbl{font-size:.6rem}
+  .card{padding:18px 16px 16px}
+  .btn.danger{margin-left:0}
+}
+</style>
+<div id="root"></div>
+<script id="state" type="application/json">{"orders":[
+{"id":"omwx14ln1","code":"001","customer":"ไม่ระบุชื่อ","item":"30","due":"2026-12-11","stage":0,"images":["043d75a4dc015c634085b5202a7bb6eb"]},
+{"id":"o1","code":"D-1041","customer":"ทีมฟุตซอล มศว. (ตัวอย่าง)","item":"ออกแบบลายเสื้อทีมและโลโก้","due":"2026-12-08","stage":3,"rev":1,"example":true},
+{"id":"o2","code":"D-1042","customer":"ร้านบอลเพื่อนพ้อง (ตัวอย่าง)","item":"ออกแบบเสื้อโปโลทีม","due":"2026-12-12","stage":2,"example":true},
+{"id":"o3","code":"D-1043","customer":"ชมรมจักรยาน (ตัวอย่าง)","item":"ลายเสื้อปั่นจักรยาน","due":"2026-12-15","stage":1,"example":true},
+{"id":"o4","code":"D-1039","customer":"โรงเรียนตัวอย่าง","item":"ออกแบบเสื้อพละ","due":"2026-11-30","stage":5,"rev":2,"example":true},
+{"id":"o5","code":"D-1036","customer":"กลุ่มวิ่งเช้า (ตัวอย่าง)","item":"ลายเสื้อวิ่งงานการกุศล","due":"2026-11-24","stage":7,"rev":2,"example":true}
+]}</script>
+<script id="app-script">
+(function(){
+var STAGES=['รับบรีฟ','ออกแบบ','ส่งแบบให้ลูกค้า','ลูกค้าแก้ไขแบบ','ลูกค้าคอนเฟิร์ม','ทำไฟล์ผลิต','ส่งมอบไฟล์'];
+var SHORT=['รับบรีฟ','ออกแบบ','ส่งแบบ','แก้ไข','คอนเฟิร์ม','ทำไฟล์','ส่งมอบ'];
+var HINT=['ทีมรับโจทย์และรวบรวมข้อมูลจากลูกค้า','ทีมกำลังออกแบบ','ส่งแบบให้ดูแล้ว รอลูกค้าตรวจแบบ','ลูกค้าขอแก้ไข ทีมกำลังปรับแบบ','รอลูกค้ายืนยันแบบสุดท้าย','ทีมกำลังเตรียมไฟล์สำหรับผลิต','กำลังส่งมอบไฟล์ให้ลูกค้า'];
+var WAIT=[0,0,1,0,1,0,0];
+var DONE=7;
+var state=JSON.parse(document.getElementById('state').textContent);
+var canEdit=false, saveTimer=null, saving=false;
+var ui={tab:'active',stage:-1,q:'',confirm:null,view:null,uploading:false,err:''};
+var artifact=null, assets=null;
+var root=document.getElementById('root');
+
+function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+function fmtDate(s){if(!s)return '';var p=s.split('-');if(p.length!==3)return s;var m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];return +p[2]+' '+m[+p[1]-1]+' '+(+p[0]+543);}
+function todayStr(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+
+/* ---------- icons (line, 24px grid) ---------- */
+var ICONS={
+  file:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>',
+  pen:'<path d="m12 19 7-7 3 3-7 7z"/><path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18z"/><path d="m2 2 7.6 7.6"/><circle cx="11" cy="11" r="2"/>',
+  send:'<path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/>',
+  edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  checkc:'<path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><path d="M22 4 12 14l-3-3"/>',
+  check:'<path d="m5 12 5 5L20 7"/>',
+  layers:'<path d="m12 2 10 5-10 5L2 7z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/>',
+  package:'<path d="m16.5 9.4-9-5.2"/><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.7z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>',
+  trash:'<path d="M3 6h18"/><path d="m19 6-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  arrow:'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  left:'<path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>',
+  rotate:'<path d="M23 4v6h-6"/><path d="M20.5 15a9 9 0 1 1-2.1-9.4L23 10"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  activity:'<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  alert:'<circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>',
+  fwd:'<path d="m13 19 9-7-9-7z"/><path d="m2 19 9-7-9-7z"/>',
+  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  phone:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/>'
+};
+var STAGE_ICONS=['file','pen','send','edit','checkc','layers','package'];
+function icon(name,size){
+  var s=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  s.setAttribute('viewBox','0 0 24 24');s.setAttribute('width',size||16);s.setAttribute('height',size||16);
+  s.setAttribute('fill','none');s.setAttribute('stroke','currentColor');s.setAttribute('stroke-width','1.6');
+  s.setAttribute('stroke-linecap','round');s.setAttribute('stroke-linejoin','round');s.setAttribute('aria-hidden','true');
+  s.innerHTML=ICONS[name]||'';
+  return s;
+}
+function withIcon(node,name,trailing,size){
+  var i=icon(name,size);
+  if(trailing)node.appendChild(i);else node.insertBefore(i,node.firstChild);
+  return node;
+}
+
+/* ---------- brand: cartoon avatar, header bar, sign-off ---------- */
+var AV_ART='<path d="M0 200C0 160 36 144 100 144C164 144 200 160 200 200Z" fill="#6d7a2e"/><path d="M28 170L22 200M48 158L44 200M70 150L68 200M130 150L132 200M152 158L156 200M172 170L178 200" stroke="#5a6624" stroke-width="2" opacity=".5" fill="none"/><path d="M80 116V150Q100 166 120 150V116Z" fill="#d6a07b"/><path d="M87 144L100 166L113 144Z" fill="#d6a07b"/><path d="M79 143L100 167L121 143" stroke="#54601f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M100 167V186" stroke="#54601f" stroke-width="2.6" stroke-linecap="round"/><ellipse cx="54" cy="92" rx="7" ry="10" fill="#dcaa86"/><ellipse cx="146" cy="92" rx="7" ry="10" fill="#dcaa86"/><ellipse cx="100" cy="88" rx="46" ry="46" fill="#ebc09d"/><g fill="#2b2321"><path d="M100 27C60 25 41 56 49 98C51 74 60 62 74 58C86 55 95 52 100 46C105 52 114 55 126 58C140 62 149 74 151 98C159 56 140 25 100 27Z"/><path d="M50 84Q45 102 55 115L62 96Z"/><path d="M150 84Q155 102 145 115L138 96Z"/></g><path d="M68 46Q84 34 98 39M104 39Q118 34 133 46M60 62Q64 54 72 50" stroke="#4d413c" stroke-width="2.4" stroke-linecap="round" fill="none"/><path d="M77 81Q85 76 94 80M106 80Q115 76 123 81" stroke="#2b2321" stroke-width="3.2" stroke-linecap="round" fill="none"/><ellipse cx="86" cy="92" rx="4" ry="3.4" fill="#2b2321"/><ellipse cx="114" cy="92" rx="4" ry="3.4" fill="#2b2321"/><circle cx="87.4" cy="90.8" r="1.1" fill="#fff"/><circle cx="115.4" cy="90.8" r="1.1" fill="#fff"/><ellipse cx="71" cy="108" rx="7" ry="4.5" fill="#f08a78" opacity=".3"/><ellipse cx="129" cy="108" rx="7" ry="4.5" fill="#f08a78" opacity=".3"/><path d="M100 93Q96 103 99 106Q103 108 105 105" stroke="#c98d69" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M91 121Q100 127 109 121" stroke="#8a4b3a" stroke-width="2.4" stroke-linecap="round" fill="none"/><path d="M80 113Q91 105 100 109Q109 105 120 113Q109 117 100 114Q91 117 80 113Z" fill="#33292a"/><path d="M92 128Q100 138 108 128Q100 131 92 128Z" fill="#33292a"/><circle cx="164" cy="164" r="17" fill="#b08d57" stroke="#fff" stroke-width="3"/><path d="M164 153l8 11-8 12-8-12z" fill="#fff"/><circle cx="164" cy="164" r="2.3" fill="#b08d57"/><path d="M34 52Q34 60 42 60Q34 60 34 68Q34 60 26 60Q34 60 34 52Z" fill="#b08d57"/><path d="M170 36Q170 42 176 42Q170 42 170 48Q170 42 164 42Q170 42 170 36Z" fill="#b08d57"/>';
+var AV_N=0;
+var BRAND='กราฟฟิกชะเอม';
+var PHONE_TEXT='082-800-2247', PHONE_TEL='0828002247';
+function avatar(size){
+  var id='avc'+(AV_N++);
+  var s=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  s.setAttribute('viewBox','0 0 200 200');s.setAttribute('width',size);s.setAttribute('height',size);
+  s.setAttribute('role','img');s.setAttribute('aria-label','การ์ตูนชะเอม');s.setAttribute('class','avatar');
+  s.innerHTML='<defs><clipPath id="'+id+'"><circle cx="100" cy="100" r="100"/></clipPath></defs><circle class="av-bg" cx="100" cy="100" r="100"/><g clip-path="url(#'+id+')">'+AV_ART+'</g>';
+  return s;
+}
+function phoneLink(){
+  var a=el('a','call',PHONE_TEXT);a.href='tel:'+PHONE_TEL;
+  return withIcon(a,'phone',false,15);
+}
+function brandBar(){
+  var b=el('div','brand');
+  var l=el('div','brand-l');
+  l.appendChild(avatar(54));
+  var t=el('div','brand-t');
+  t.appendChild(el('b',null,BRAND));
+  t.appendChild(el('span',null,'งานออกแบบกราฟิก'));
+  l.appendChild(t);b.appendChild(l);
+  b.appendChild(phoneLink());
+  return b;
+}
+function signoff(){
+  var c=el('section','signoff');
+  c.appendChild(avatar(96));
+  var t=el('div','signoff-t');
+  t.appendChild(el('p','bubble','สงสัยเรื่องแบบ หรืออยากแก้ตรงไหน ทักมาได้เลย'));
+  t.appendChild(el('b',null,BRAND));
+  t.appendChild(phoneLink());
+  c.appendChild(t);
+  return c;
+}
+
+/* ---------- saving ---------- */
+function buildDoc(){
+  var reset=document.head.querySelector('style:not(#app-style)');
+  var css=reset?reset.textContent:':root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}';
+  var title=document.querySelector('title').outerHTML;
+  var meta=document.querySelector('meta[name="claude:viewport-fit-sides"]').outerHTML;
+  var link=document.querySelector('link[rel="stylesheet"][href*="fonts.googleapis"]').outerHTML;
+  var appCss=document.getElementById('app-style').textContent;
+  var js=document.getElementById('app-script').textContent;
+  var json=JSON.stringify(state).replace(/</g,'\\u003c');
+  return '<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>'+css+'</style></head><body>'
+   +title+'\n'+meta+'\n'+link+'\n<style id="app-style">'+appCss+'</style>\n<div id="root"></div>\n<script id="state" type="application/json">'+json+'<\/script>\n<script id="app-script">'+js+'<\/script></body></html>';
+}
+function queueSave(){
+  if(!artifact)return;
+  clearTimeout(saveTimer);
+  saving=true;render();
+  saveTimer=setTimeout(function(){
+    artifact.publish(buildDoc()).catch(function(){saving=false;render();});
+  },900);
+}
+function change(fn){fn();queueSave();render();}
+
+/* ---------- images ---------- */
+function shrink(file){
+  return new Promise(function(res,rej){
+    var img=new Image(), u=URL.createObjectURL(file);
+    img.onload=function(){
+      var s=Math.min(1,1600/Math.max(img.naturalWidth,img.naturalHeight));
+      var c=document.createElement('canvas');
+      c.width=Math.max(1,Math.round(img.naturalWidth*s));c.height=Math.max(1,Math.round(img.naturalHeight*s));
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(u);
+      c.toBlob(function(b){b?res(b):rej(new Error('blob'));},'image/jpeg',0.85);
+    };
+    img.onerror=function(){URL.revokeObjectURL(u);rej(new Error('load'));};
+    img.src=u;
+  });
+}
+function uploadFiles(files){
+  var arr=Array.prototype.slice.call(files||[]).filter(function(f){return /^image\//.test(f.type);});
+  if(!assets||!arr.length)return Promise.resolve([]);
+  ui.uploading=true;ui.err='';render();
+  return Promise.all(arr.map(function(f){
+    return shrink(f).catch(function(){return f;})
+      .then(function(b){return assets.upload(b);})
+      .then(function(r){return r.id;})
+      .catch(function(){return null;});
+  })).then(function(ids){
+    ui.uploading=false;
+    var ok=ids.filter(Boolean);
+    if(ok.length<arr.length)ui.err='อัปโหลดรูปไม่สำเร็จ '+(arr.length-ok.length)+' รูป ลองใหม่อีกครั้ง';
+    return ok;
+  });
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ui.view){ui.view=null;render();}});
+
+/* ---------- render ---------- */
+function visible(){
+  var q=ui.q.trim().toLowerCase();
+  return state.orders.filter(function(o){
+    if(ui.tab==='active'&&o.stage===DONE)return false;
+    if(ui.tab==='done'&&o.stage!==DONE)return false;
+    if(ui.stage>=0&&o.stage!==ui.stage)return false;
+    if(q&&(o.code+' '+o.customer+' '+o.item).toLowerCase().indexOf(q)<0)return false;
+    return true;
+  });
+}
+function render(){
+  root.textContent='';
+  root.appendChild(brandBar());
+  var active=state.orders.filter(function(o){return o.stage!==DONE;});
+  var late=active.filter(function(o){return o.due&&o.due<todayStr();}).length;
+  var wait=active.filter(function(o){return WAIT[o.stage];}).length;
+
+  /* hero */
+  var hero=el('section','hero');
+  var ht=el('div','hero-top');
+  ht.appendChild(el('span','eyebrow','สถานะงานออกแบบกราฟิก'));
+  if(canEdit)ht.appendChild(withIcon(el('span','owner','โหมดเจ้าของร้าน'),'pen',false,12));
+  hero.appendChild(ht);
+  hero.appendChild(el('h1',null,'ติดตามงานออกแบบ'));
+  hero.appendChild(el('p','sub','ดูว่าแบบของคุณอยู่ขั้นตอนไหน และตอนนี้รอทีมออกแบบหรือรอคุณตรวจแบบ'));
+  var s=document.createElement('input');s.type='text';s.id='search';s.className='hsearch';s.placeholder='ค้นหา รหัสงาน หรือ ชื่อลูกค้า';s.value=ui.q;
+  s.setAttribute('aria-label','ค้นหางาน');
+  s.oninput=function(){ui.q=s.value;var pos=s.selectionStart;render();var n=document.getElementById('search');n.focus();n.setSelectionRange(pos,pos);};
+  hero.appendChild(s);
+  var stats=el('div','stats');
+  [[active.length,'กำลังทำ','','activity'],[wait,'รอลูกค้า','','clock'],[state.orders.length-active.length,'เสร็จแล้ว','','checkc'],[late,'เลยกำหนด',late?'warn':'','alert']].forEach(function(t){
+    var d=el('div','stat');d.appendChild(el('b',t[2],String(t[0])));d.appendChild(withIcon(el('span',null,t[1]),t[3],false,15));stats.appendChild(d);
+  });
+  hero.appendChild(stats);
+  root.appendChild(hero);
+
+  /* stage chips */
+  var sec=el('div','sec');
+  sec.appendChild(el('h2',null,'ตอนนี้งานอยู่ที่ขั้นตอนไหนบ้าง'));
+  var chips=el('div','chips');
+  STAGES.forEach(function(name,i){
+    var n=active.filter(function(o){return o.stage===i;}).length;
+    var b=el('button','chip s'+i+(n?' has':''));
+    b.type='button';b.setAttribute('aria-pressed',ui.stage===i?'true':'false');
+    b.appendChild(el('b',null,String(n)));b.appendChild(el('span',null,name));b.appendChild(icon(STAGE_ICONS[i],16));
+    b.onclick=function(){ui.stage=ui.stage===i?-1:i;if(ui.tab==='done')ui.tab='active';render();};
+    chips.appendChild(b);
+  });
+  sec.appendChild(chips);
+  root.appendChild(sec);
+
+  var tabs=el('div','tabs');
+  [['active','กำลังทำ'],['done','เสร็จแล้ว'],['all','ทั้งหมด']].forEach(function(t){
+    var b=el('button',null,t[1]);b.type='button';b.setAttribute('aria-pressed',ui.tab===t[0]?'true':'false');
+    b.onclick=function(){ui.tab=t[0];render();};tabs.appendChild(b);
+  });
+  root.appendChild(tabs);
+
+  if(canEdit)root.appendChild(addForm());
+
+  var list=el('div','list');
+  var rows=visible();
+  if(!rows.length){
+    var em=el('div','empty');em.appendChild(icon('file',28));
+    em.appendChild(el('p',null,state.orders.length?'ไม่พบงานที่ตรงกับการค้นหา':'ยังไม่มีงาน เพิ่มงานแรกได้ที่ฟอร์มด้านบน'));
+    list.appendChild(em);
+  }
+  rows.forEach(function(o){list.appendChild(card(o));});
+  root.appendChild(list);
+  root.appendChild(signoff());
+
+  if(canEdit)root.appendChild(el('p','note','การกดแต่ละครั้งจะบันทึกอัตโนมัติ ลูกค้าจะเห็นสถานะใหม่เมื่อเปิดหน้านี้อีกครั้ง'));
+  if(ui.uploading||saving)root.appendChild(Object.assign(el('div',null,ui.uploading?'กำลังอัปโหลดรูป…':'กำลังบันทึก…'),{id:'saving'}));
+  if(ui.err)root.appendChild(el('p','note',ui.err));
+  if(ui.view){
+    var lb=el('div','lightbox');lb.onclick=function(){ui.view=null;render();};
+    var big=document.createElement('img');big.src=ui.view;big.alt='รูปประกอบงาน';lb.appendChild(big);
+    var cl=el('button',null,'ปิด');cl.type='button';lb.appendChild(cl);
+    root.appendChild(lb);
+  }
+}
+
+function card(o){
+  var c=el('article','card s'+o.stage);
+  var fin=o.stage===DONE;
+  var isLate=!fin&&o.due&&o.due<todayStr();
+  var top=el('div','top');
+  top.appendChild(el('span','code',o.code));
+  top.appendChild(withIcon(el('span','pill',fin?'เสร็จแล้ว':'ตอนนี้: '+STAGES[o.stage]),fin?'checkc':STAGE_ICONS[o.stage],false,14));
+  c.appendChild(top);
+  c.appendChild(el('div','who',o.customer));
+  if(o.item)c.appendChild(el('div','item',o.item));
+  if(o.images&&o.images.length){
+    var th=el('div','thumbs'+(o.images.length===1?' one':''));
+    o.images.forEach(function(id){
+      var t=el('div','thumb');
+      var ob=el('button','open');ob.type='button';ob.setAttribute('aria-label','ดูรูปขยาย');
+      var im=document.createElement('img');im.src='/_blob/'+id;im.alt='รูปประกอบ';im.loading='lazy';
+      ob.appendChild(im);ob.onclick=function(){ui.view='/_blob/'+id;render();};
+      t.appendChild(ob);
+      if(canEdit){
+        var x=el('button','x','×');x.type='button';x.setAttribute('aria-label','เอารูปออก');
+        x.onclick=function(){change(function(){o.images=o.images.filter(function(k){return k!==id;});});};
+        t.appendChild(x);
+      }
+      th.appendChild(t);
+    });
+    c.appendChild(th);
+  }
+
+  var steps=el('div','steps');
+  STAGES.forEach(function(n,i){
+    var cls='step s'+i+(fin||i<o.stage?' done':(i===o.stage?' now':''));
+    var st=el('div',cls);
+    var dt=el('span','dot');dt.appendChild(icon(STAGE_ICONS[i],14));st.appendChild(dt);
+    st.appendChild(el('span','lbl',SHORT[i]));
+    steps.appendChild(st);
+  });
+  c.appendChild(steps);
+  if(!fin){
+    var hint=el('div','hint');
+    hint.appendChild(withIcon(el('span','turn'+(WAIT[o.stage]?' cust':''),WAIT[o.stage]?'รอลูกค้า':'ทีมกำลังทำ'),WAIT[o.stage]?'clock':'pen',false,12));
+    hint.appendChild(el('span',null,HINT[o.stage]));
+    c.appendChild(hint);
+  }
+
+  var meta=el('div','meta');
+  if(o.due){var d=el('span','due','กำหนดส่งงาน '+fmtDate(o.due));withIcon(d,'calendar',false,14);meta.appendChild(d);}
+  if(!fin)meta.appendChild(el('span',null,'ขั้นที่ '+(o.stage+1)+' จาก '+STAGES.length));
+  if(o.rev)meta.appendChild(withIcon(el('span',null,'แก้ไขแล้ว '+o.rev+' ครั้ง'),'rotate',false,14));
+  if(isLate)meta.appendChild(withIcon(el('span','pill late','เลยกำหนด'),'alert',false,14));
+  if(o.example)meta.appendChild(el('span','badge','ข้อมูลตัวอย่าง'));
+  c.appendChild(meta);
+
+  if(canEdit){
+    var a=el('div','actions');
+    if(!fin){
+      var next=el('button','btn primary',o.stage===STAGES.length-1?'ส่งมอบไฟล์แล้ว':'ไปขั้นต่อไป: '+STAGES[o.stage+1]);
+      withIcon(next,o.stage===STAGES.length-1?'check':'arrow',true,16);
+      next.type='button';next.onclick=function(){change(function(){o.stage+=1;});};
+      a.appendChild(next);
+      if(o.stage===2){var skip=el('button','btn','ลูกค้าไม่แก้ ข้ามไปคอนเฟิร์ม');withIcon(skip,'fwd',false,15);skip.type='button';skip.onclick=function(){change(function(){o.stage=4;});};a.appendChild(skip);}
+      if(o.stage===3){var again=el('button','btn','แก้แล้ว ส่งแบบใหม่ให้ลูกค้า');withIcon(again,'rotate',false,15);again.type='button';again.onclick=function(){change(function(){o.stage=2;o.rev=(o.rev||0)+1;});};a.appendChild(again);}
+    }
+    if(o.stage>0){
+      var back=el('button','btn','ย้อนกลับ');withIcon(back,'left',false,15);back.type='button';
+      back.onclick=function(){change(function(){o.stage-=1;});};a.appendChild(back);
+    }
+    if(assets){
+      var pin=document.createElement('input');pin.type='file';pin.accept='image/*';pin.multiple=true;pin.hidden=true;
+      pin.onchange=function(){uploadFiles(pin.files).then(function(ids){if(ids.length)change(function(){o.images=(o.images||[]).concat(ids);});else render();});};
+      var pb=el('button','btn','เพิ่มรูป');withIcon(pb,'image',false,15);pb.type='button';pb.onclick=function(){pin.click();};
+      a.appendChild(pin);a.appendChild(pb);
+    }
+    var del=el('button','btn danger'+(ui.confirm===o.id?' sure':''),ui.confirm===o.id?'กดอีกครั้งเพื่อลบ':'ลบ');
+    withIcon(del,'trash',false,15);
+    del.type='button';
+    del.onclick=function(){
+      if(ui.confirm===o.id){ui.confirm=null;change(function(){state.orders=state.orders.filter(function(x){return x.id!==o.id;});});}
+      else{ui.confirm=o.id;render();}
+    };
+    a.appendChild(del);
+    c.appendChild(a);
+  }
+  return c;
+}
+
+function addForm(){
+  var f=el('form','form');
+  f.appendChild(el('h2',null,'เพิ่มงานใหม่'));
+  var g=el('div','grid');
+  function field(id,label,type,ph){
+    var l=el('label',null,label);l.setAttribute('for',id);
+    var i=document.createElement('input');i.type=type;i.id=id;if(ph)i.placeholder=ph;
+    l.appendChild(i);g.appendChild(l);return i;
+  }
+  var code=field('f-code','รหัสงาน','text','เช่น D-1044');
+  var cust=field('f-cust','ชื่อลูกค้า','text','เช่น ทีมฟุตซอล');
+  var item=field('f-item','งานออกแบบ','text','เช่น ลายเสื้อทีมฟุตซอล');
+  var due=field('f-due','กำหนดส่งงาน','date');
+  var img=null;
+  if(assets){img=field('f-img','รูปอ้างอิงหรือรูปแบบ (ไม่บังคับ)','file');img.accept='image/*';img.multiple=true;}
+  f.appendChild(g);
+  var add=el('button','btn primary','เพิ่มงาน');withIcon(add,'plus',false,16);add.type='submit';add.style.justifySelf='start';
+  f.appendChild(add);
+  f.onsubmit=function(e){
+    e.preventDefault();
+    if(!cust.value.trim()&&!code.value.trim())return;
+    var n=state.orders.length+1;
+    var vals={code:code.value.trim()||('#'+n),customer:cust.value.trim()||'ไม่ระบุชื่อ',item:item.value.trim(),due:due.value};
+    uploadFiles(img?img.files:[]).then(function(ids){
+      change(function(){state.orders.unshift({id:'o'+Date.now().toString(36),code:vals.code,customer:vals.customer,item:vals.item,due:vals.due,stage:0,images:ids});});
+    });
+  };
+  return f;
+}
+
+render();
+if(window.claude&&claude.use){
+  claude.use('user').then(function(u){return u?u.canEdit():false;}).then(function(v){canEdit=!!v;render();}).catch(function(){});
+  claude.use('artifact').then(function(a){artifact=a;}).catch(function(){});
+  claude.use('assets').then(function(a){assets=a;render();}).catch(function(){});
+}
+})();
+</script>
+
+</body></html>
