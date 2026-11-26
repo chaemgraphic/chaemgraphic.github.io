@@ -197,6 +197,10 @@ input[type=file]{font:inherit;font-size:.85rem;color:var(--muted);max-width:100%
 .card.paste-on{border-color:var(--gold)}
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(64px + env(safe-area-inset-bottom,0px));max-width:min(92vw,460px);background:var(--fg);color:var(--bg);padding:9px 18px;border-radius:12px;font-size:.84rem;font-weight:500;z-index:70;text-align:center;line-height:1.45}
 #toast[hidden]{display:none}
+.errbar{position:fixed;left:50%;transform:translateX(-50%);top:calc(12px + env(safe-area-inset-top,0px));width:min(94vw,560px);display:flex;align-items:flex-start;gap:12px;justify-content:space-between;background:#b42318;color:#fff;padding:12px 14px 12px 16px;border-radius:12px;font-size:.84rem;line-height:1.5;z-index:80;box-shadow:0 8px 28px rgba(0,0,0,.28)}
+.errbar span{display:flex;gap:8px;align-items:flex-start}
+.errbar span svg{flex:none;margin-top:3px}
+.errbar button{flex:none;background:rgba(255,255,255,.18);border:0;color:#fff;font:inherit;font-size:.8rem;border-radius:8px;padding:4px 12px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -358,14 +362,22 @@ async function commit(op,msg){
     catch(e){if((e.status===409||e.status===422)&&i<3)continue;throw e;}
   }
 }
+function errText(e){
+  var s=e&&e.status;
+  if(s===401)return 'โทเคนใช้ไม่ได้หรือหมดอายุ (401) ออกจากระบบแล้วสร้างโทเคนใหม่';
+  if(s===403)return 'บันทึกไม่ได้ (403) โทเคนยังไม่มีสิทธิ์แก้ไขไฟล์ ให้ตั้ง Contents เป็น Read and write';
+  if(s===404)return 'บันทึกไม่ได้ (404) GitHub หา repository ไม่เจอ ตรวจว่าโทเคนเลือก repository นี้ไว้ และตั้ง Contents เป็น Read and write';
+  if(s===409||s===422)return 'บันทึกไม่ได้ (' + s + ') ข้อมูลชนกับการแก้ไขอื่น ลองกดอีกครั้ง';
+  return 'บันทึกไม่ได้ ('+(s||'เครือข่าย')+') ตรวจอินเทอร์เน็ตแล้วลองอีกครั้ง';
+}
 var chain=Promise.resolve();
 function enqueue(op,msg){
   ui.pending++;
   chain=chain.then(function(){return commit(op,msg);}).then(function(){
-    ui.pending--;render();
+    ui.pending--;ui.err='';render();
   },function(e){
     ui.pending--;
-    ui.err='บันทึกไม่สำเร็จ ('+(e.status||'เครือข่าย')+') ระบบจะโหลดข้อมูลล่าสุดมาให้ ลองทำอีกครั้ง';
+    ui.err=errText(e)+' · ระบบโหลดข้อมูลล่าสุดมาให้แล้ว งานที่เพิ่งกดจึงกลับมาเหมือนเดิม';
     return loadOwner();
   });
 }
@@ -608,7 +620,12 @@ function render(){
   root.appendChild(adminArea());
 
   if(ui.uploading||ui.pending>0)root.appendChild(Object.assign(el('div',null,ui.uploading?'กำลังอัปโหลดรูป…':'กำลังบันทึก…'),{id:'saving'}));
-  if(ui.err)root.appendChild(el('p','note err',ui.err));
+  if(ui.err){
+    var eb=el('div','errbar');eb.setAttribute('role','alert');
+    eb.appendChild(withIcon(el('span',null,ui.err),'alert',false,16));
+    var ex=el('button',null,'ปิด');ex.type='button';ex.onclick=function(){ui.err='';render();};
+    eb.appendChild(ex);root.appendChild(eb);
+  }
   if(ui.view){
     var lb=el('div','lightbox');lb.onclick=function(){ui.view=null;render();};
     var big=document.createElement('img');big.src=imgSrc(ui.view);big.alt='รูปประกอบงาน';lb.appendChild(big);
