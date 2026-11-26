@@ -335,6 +335,21 @@ h1 .h-fill{background:linear-gradient(95deg,#ffc27a 0%,#e0613a 45%,#e9c98d 100%)
 @keyframes marquee{to{transform:translateX(-50%)}}
 @keyframes float{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(1deg)}}
 @keyframes slidein{from{transform:translateX(-24px);opacity:.2}to{transform:none;opacity:1}}
+/* ---- GitHub edit mode ---- */
+.gh-key{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:40;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:1px solid var(--line-strong);background:var(--surface);color:var(--fg);font:inherit;font-weight:600;font-size:.9rem;cursor:pointer;box-shadow:0 10px 24px -12px rgba(0,0,0,.45)}
+.gh-key.on{background:#e0613a;border-color:#e0613a;color:#fff}
+.gh-key small{font-weight:500;opacity:.85}
+.gh-dlg{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(10,10,12,.55)}
+.gh-box{width:min(460px,100%);display:grid;gap:12px;padding:22px;border-radius:18px;background:var(--bg);color:var(--fg);border:1px solid var(--line-strong);box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
+.gh-box h2{margin:0;font-family:var(--display);font-size:1.3rem}
+.gh-box p,.gh-box ol{margin:0;color:var(--muted);font-size:.9rem;line-height:1.6}
+.gh-box ol{padding-left:1.2em}
+.gh-box a{color:var(--gold-ink)}
+.gh-box input{width:100%;box-sizing:border-box;padding:11px 12px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);color:var(--fg);font:inherit;font-family:var(--mono)}
+.gh-row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.gh-row button{padding:10px 16px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);color:var(--fg);font:inherit;font-weight:600;cursor:pointer}
+.gh-row button.pri{background:#e0613a;border-color:#e0613a;color:#fff}
+.gh-err{color:var(--danger);font-size:.88rem;font-weight:600}
 @media (max-width:480px){
   .hero{--hp:16px;padding:22px var(--hp) 0;border-radius:22px}
   .hero-head{grid-template-columns:minmax(0,1fr) 118px}
@@ -371,7 +386,7 @@ h1 .h-fill{background:linear-gradient(95deg,#ffc27a 0%,#e0613a 45%,#e9c98d 100%)
 @media (max-width:600px){.signoff{grid-template-columns:auto 1fr}.qr{display:none}}
 </style>
 <div id="root"></div>
-<script id="state" type="application/json">{"orders":[{"id":"omwx14ln1","code":"001","customer":"ไม่ระบุชื่อ","item":"30","due":"2026-12-11","stage":1,"images":["043d75a4dc015c634085b5202a7bb6eb"],"now":true},{"id":"o1","code":"D-1041","customer":"ทีมฟุตซอล มศว. (ตัวอย่าง)","item":"ออกแบบลายเสื้อทีมและโลโก้","due":"2026-12-08","stage":3,"rev":1,"example":true},{"id":"o2","code":"D-1042","customer":"ร้านบอลเพื่อนพ้อง (ตัวอย่าง)","item":"ออกแบบเสื้อโปโลทีม","due":"2026-12-12","stage":2,"example":true},{"id":"o3","code":"D-1043","customer":"ชมรมจักรยาน (ตัวอย่าง)","item":"ลายเสื้อปั่นจักรยาน","due":"2026-12-15","stage":1,"example":true},{"id":"o4","code":"D-1039","customer":"โรงเรียนตัวอย่าง","item":"ออกแบบเสื้อพละ","due":"2026-11-30","stage":5,"rev":2,"example":true},{"id":"o5","code":"D-1036","customer":"กลุ่มวิ่งเช้า (ตัวอย่าง)","item":"ลายเสื้อวิ่งงานการกุศล","due":"2026-11-24","stage":7,"rev":2,"example":true}],"theme":{}}</script>
+<script id="state" type="application/json">{"orders": [], "theme": {}}</script>
 <script id="app-script">
 (function(){
 var STAGES=['รับบรีฟ','ออกแบบ','ส่งแบบให้ลูกค้า','ลูกค้าแก้ไขแบบ','ลูกค้าคอนเฟิร์ม','ทำไฟล์ผลิต','ส่งมอบไฟล์'];
@@ -385,7 +400,8 @@ var state=JSON.parse(document.getElementById('state').textContent);
 if(!state.theme)state.theme={};
 var canEdit=false, saveTimer=null, saving=false;
 var ui={tab:'active',stage:-1,q:'',confirm:null,view:null,uploading:false,err:'',pasteTarget:null,pending:[],draft:{}};
-var artifact=null, assets=null;
+var artifact=null, assets=null, GH=null;
+function B(id){if(id.indexOf('/')<0)return '/_blob/'+id;return GH&&GH.branch?'https://raw.githubusercontent.com/'+GH.owner+'/'+GH.repo+'/'+GH.branch+'/'+id:id;}
 var root=document.getElementById('root');
 
 function el(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
@@ -454,7 +470,7 @@ function lineLink(label){
 function brandBar(){
   var b=el('div','brand');
   var l=el('div','brand-l');
-  if(state.theme.logo){var lg=document.createElement('img');lg.className='logo';lg.src='/_blob/'+state.theme.logo;lg.alt=BRAND;l.appendChild(lg);}
+  if(state.theme.logo){var lg=document.createElement('img');lg.className='logo';lg.src=B(state.theme.logo);lg.alt=BRAND;l.appendChild(lg);}
   else l.appendChild(avatar(54));
   var t=el('div','brand-t');
   t.appendChild(el('b',null,BRAND));
@@ -559,9 +575,9 @@ document.addEventListener('paste',function(e){
 var FAV='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="30" fill="#111113"/><path d="M32 12l14 20-14 20-14-20z" fill="#c9a96e"/><circle cx="32" cy="32" r="4" fill="#111113"/></svg>');
 function applyTheme(){
   var r=document.documentElement,t=state.theme;
-  if(t.bg){r.style.setProperty('--bg-art','url("/_blob/'+t.bg+'")');r.classList.add('has-art');}
+  if(t.bg){r.style.setProperty('--bg-art','url("'+B(t.bg)+'")');r.classList.add('has-art');}
   else{r.style.removeProperty('--bg-art');r.classList.remove('has-art');}
-  var href=t.logo?'/_blob/'+t.logo:FAV;
+  var href=t.logo?B(t.logo):FAV;
   var l=document.querySelector('link[rel="icon"]');
   if(!l){l=document.createElement('link');l.rel='icon';document.head.appendChild(l);}
   if(l.getAttribute('href')!==href)l.setAttribute('href',href);
@@ -655,7 +671,7 @@ function render(){
   root.appendChild(list);
   root.appendChild(signoff());
 
-  if(canEdit)root.appendChild(el('p','note','การกดแต่ละครั้งจะบันทึกอัตโนมัติ ลูกค้าจะเห็นสถานะใหม่เมื่อเปิดหน้านี้อีกครั้ง'));
+  if(canEdit)root.appendChild(el('p','note','การกดแต่ละครั้งจะบันทึกอัตโนมัติ ลูกค้าจะเห็นสถานะใหม่เมื่อเปิดหน้านี้อีกครั้ง'+(GH?' (บน GitHub รอประมาณ 1–2 นาที)':'')));
   if(ui.uploading||saving)root.appendChild(Object.assign(el('div',null,ui.uploading?'กำลังอัปโหลดรูป…':'กำลังบันทึก…'),{id:'saving'}));
   if(ui.err)root.appendChild(el('p','note',ui.err));
   if(ui.view){
@@ -684,8 +700,8 @@ function card(o){
     o.images.forEach(function(id){
       var t=el('div','thumb');
       var ob=el('button','open');ob.type='button';ob.setAttribute('aria-label','ดูรูปขยาย');
-      var im=document.createElement('img');im.src='/_blob/'+id;im.alt='รูปประกอบ';im.loading='lazy';
-      ob.appendChild(im);ob.onclick=function(){ui.view='/_blob/'+id;render();};
+      var im=document.createElement('img');im.src=B(id);im.alt='รูปประกอบ';im.loading='lazy';
+      ob.appendChild(im);ob.onclick=function(){ui.view=B(id);render();};
       t.appendChild(ob);
       if(canEdit){
         var x=el('button','x','×');x.type='button';x.setAttribute('aria-label','เอารูปออก');
@@ -816,6 +832,95 @@ function addForm(){
   return f;
 }
 
+
+/* ---------- GitHub Pages: data.json + edit with a token ---------- */
+(function(){
+  var hm=location.hostname.match(/^([^.]+)\.github\.io$/i);
+  if(!hm||(window.claude&&claude.use))return;
+  var seg=location.pathname.split('/').filter(Boolean);
+  GH={owner:hm[1],repo:(seg[0]&&!/\.html?$/i.test(seg[0]))?seg[0]:hm[1]+'.github.io',branch:null,token:null};
+  var KEY='cg_token',DATA='data/orders.json';
+  function norm(d){d.theme=d.theme||{};(d.orders||[]).forEach(function(o){if(o.now===undefined&&o.working)o.now=true;o.images=o.images||[];});return d;}
+  function out(){return JSON.stringify({orders:state.orders.map(function(o){var c={};for(var k in o)c[k]=o[k];if(c.now){c.working=true;c.workSince=c.workSince||new Date().toISOString();}else{delete c.working;delete c.workSince;}return c;})},null,1);}
+  function api(path,opt){
+    opt=opt||{};var h={'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
+    if(GH.token)h.Authorization='Bearer '+GH.token;
+    for(var k in (opt.headers||{}))h[k]=opt.headers[k];
+    return fetch('https://api.github.com/repos/'+GH.owner+'/'+GH.repo+path,{method:opt.method||'GET',headers:h,body:opt.body,cache:'no-store'});
+  }
+  function b64(str){return btoa(unescape(encodeURIComponent(str)));}
+  function blob64(b){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(String(r.result).split(',')[1]);};r.onerror=rej;r.readAsDataURL(b);});}
+  function put(path,content,msg){
+    return api('/contents/'+path+'?ref='+GH.branch).then(function(r){return r.ok?r.json():{};}).then(function(cur){
+      return api('/contents/'+path,{method:'PUT',body:JSON.stringify({message:msg,content:content,branch:GH.branch,sha:cur.sha||undefined})});
+    }).then(function(r){if(!r.ok)throw new Error('put '+r.status);return r.json();});
+  }
+  var chain=Promise.resolve();
+  function saveData(){
+    chain=chain.then(function(){
+      var body=b64(out());
+      return put(DATA,body,'อัปเดตสถานะงาน').catch(function(){return put(DATA,body,'อัปเดตสถานะงาน');});
+    }).then(function(){saving=false;ghErr='';render();},function(){saving=false;ghErr='บันทึกลง GitHub ไม่สำเร็จ ตรวจ token หรืออินเทอร์เน็ต แล้วกดเปลี่ยนอะไรสักอย่างอีกครั้ง';render();});
+    return chain;
+  }
+  function upload(b){
+    var name='images/'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)+'.jpg';
+    return blob64(b).then(function(c){return put(name,c,'เพิ่มรูปงาน');}).then(function(){return {id:name};});
+  }
+  var ghErr='';
+  function enter(tok,silent){
+    GH.token=tok;
+    return api('').then(function(r){if(!r.ok)throw new Error(r.status);return r.json();}).then(function(info){
+      if(!info.permissions||!info.permissions.push)throw new Error('perm');
+      GH.branch=info.default_branch||'main';
+      return api('/contents/'+DATA+'?ref='+GH.branch,{headers:{Accept:'application/vnd.github.raw+json'}});
+    }).then(function(r){return r.ok?r.json():null;}).then(function(d){
+      if(d&&d.orders){state=norm(d);}
+      try{localStorage.setItem(KEY,tok);}catch(e){}
+      canEdit=true;artifact={publish:saveData};assets={upload:upload};render();bar();
+    }).catch(function(e){
+      GH.token=null;if(silent){try{localStorage.removeItem(KEY);}catch(x){}bar();return;}
+      throw e;
+    });
+  }
+  function leave(){try{localStorage.removeItem(KEY);}catch(e){}GH.token=null;canEdit=false;artifact=null;assets=null;render();bar();}
+  var btn=document.createElement('button');btn.type='button';document.body.appendChild(btn);
+  function bar(){
+    btn.className='gh-key'+(canEdit?' on':'');btn.textContent='';
+    btn.appendChild(icon(canEdit?'pen':'image',16));
+    btn.appendChild(document.createTextNode(canEdit?' กำลังแก้ไข ':' เข้าสู่โหมดแก้ไข'));
+    if(canEdit){var sm=document.createElement('small');sm.textContent='(กดเพื่อออก)';btn.appendChild(sm);}
+    if(ghErr){btn.title=ghErr;}
+  }
+  btn.onclick=function(){if(canEdit){leave();return;}dialog();};
+  function dialog(){
+    var d=document.createElement('div');d.className='gh-dlg';
+    d.innerHTML='<form class="gh-box"><h2>เข้าสู่โหมดแก้ไข</h2>'
+      +'<p>วาง token ที่ขึ้นต้นด้วย github_pat_ (ตัวเดิมที่เคยสร้างไว้ใช้ได้) เว็บจะบันทึกงานและรูปลง repo <b></b> ให้เอง token เก็บไว้ในเบราว์เซอร์เครื่องนี้เท่านั้น</p>'
+      +'<ol><li>เปิด <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">สร้าง fine-grained token</a></li><li>Repository access: เลือกเฉพาะ repo นี้</li><li>Permissions → Contents: Read and write</li><li>กด Generate แล้วคัดลอกมาวางด้านล่าง</li></ol>'
+      +'<input type="password" autocomplete="off" placeholder="github_pat_..." aria-label="GitHub token">'
+      +'<div class="gh-err" hidden></div>'
+      +'<div class="gh-row"><button type="button" class="cancel">ยกเลิก</button><button type="submit" class="pri">เข้าสู่โหมดแก้ไข</button></div></form>';
+    d.querySelector('b').textContent=GH.owner+'/'+GH.repo;
+    var f=d.querySelector('form'),inp=d.querySelector('input'),er=d.querySelector('.gh-err'),ok=d.querySelector('.pri');
+    function close(){d.remove();}
+    d.querySelector('.cancel').onclick=close;
+    d.addEventListener('click',function(e){if(e.target===d)close();});
+    f.onsubmit=function(e){
+      e.preventDefault();var t=inp.value.trim();if(!t)return;
+      ok.disabled=true;ok.textContent='กำลังตรวจสอบ…';er.hidden=true;
+      enter(t,false).then(close).catch(function(x){
+        ok.disabled=false;ok.textContent='เข้าสู่โหมดแก้ไข';er.hidden=false;
+        er.textContent=String(x.message)==='perm'?'token นี้ไม่มีสิทธิ์เขียน repo นี้ (ต้องตั้ง Contents: Read and write)':'ใช้ token นี้ไม่ได้ ตรวจว่าคัดลอกครบ และเลือก repo '+GH.owner+'/'+GH.repo+' แล้ว';
+      });
+    };
+    document.body.appendChild(d);inp.focus();
+  }
+  bar();
+  var saved=null;try{saved=localStorage.getItem(KEY);}catch(e){}
+  if(saved)enter(saved,true);
+  else fetch(DATA+'?t='+Date.now(),{cache:'no-store'}).then(function(r){return r.ok?r.json():null;}).then(function(d){if(d&&d.orders&&!canEdit){state=norm(d);render();}}).catch(function(){});
+})();
 root.classList.add('intro');render();setTimeout(function(){root.classList.remove('intro');},2800);
 if(window.claude&&claude.use){
   claude.use('user').then(function(u){return u?u.canEdit():false;}).then(function(v){canEdit=!!v;render();}).catch(function(){});
