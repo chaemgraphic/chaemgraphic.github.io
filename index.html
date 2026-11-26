@@ -321,6 +321,37 @@ h2.sh{display:flex;align-items:center;gap:10px;margin:0;font-family:var(--displa
   .stat span{flex-direction:row;align-items:center;font-size:.78rem}
   .chip{padding:7px 12px}
 }
+
+/* ===== "working on it now": pinned first, animated ===== */
+:root{--live:#16a34a;--live-ink:#0f7a35}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--live:#4ade80;--live-ink:#6ee7a1}}
+:root[data-theme="dark"]{--live:#4ade80;--live-ink:#6ee7a1}
+.livedot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--live);animation:livepulse 1.7s ease-out infinite}
+.scribble{flex:none;color:var(--live-ink);overflow:visible}
+.scribble path{stroke-dasharray:60;stroke-dashoffset:60;animation:livedraw 2.4s ease-in-out infinite}
+.nowbar{position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;width:100%;text-align:left;font:inherit;color:var(--fg);cursor:pointer;
+  padding:14px 18px;border-radius:16px;border:1px solid color-mix(in srgb,var(--live) 45%,var(--line));
+  background:linear-gradient(100deg,color-mix(in srgb,var(--live) 14%,var(--surface)),var(--surface) 72%)}
+.nowbar::after{content:"";position:absolute;inset:0;pointer-events:none;transform:translateX(-100%);animation:liveslide 3.4s ease-in-out infinite;
+  background:linear-gradient(100deg,transparent 30%,color-mix(in srgb,var(--live) 16%,transparent) 50%,transparent 70%)}
+.nowtxt{display:grid;gap:1px;min-width:0;flex:1}
+.nowtxt b{font-family:var(--display);font-weight:500;font-size:.98rem}
+.nowtxt span{font-size:.82rem;color:var(--muted);overflow-wrap:anywhere}
+.nowtxt .since{font-size:.74rem}
+.livebadge{display:inline-flex;align-items:center;gap:9px;justify-self:start;padding:4px 14px 4px 11px;border-radius:99px;font-size:.78rem;font-weight:500;color:var(--live-ink);
+  background:color-mix(in srgb,var(--live) 13%,var(--surface));border:1px solid color-mix(in srgb,var(--live) 45%,var(--line))}
+.card.working{border-color:var(--sc);animation:liveglow 2.6s ease-in-out infinite}
+.card.working::before{height:5px;background:linear-gradient(90deg,color-mix(in srgb,var(--sc) 25%,transparent),var(--sc),color-mix(in srgb,var(--sc) 25%,transparent));background-size:200% 100%;animation:liveshine 1.8s linear infinite}
+.btn.nowbtn{color:var(--live-ink);border-color:color-mix(in srgb,var(--live) 50%,var(--line-strong))}
+.btn.nowbtn.on{background:var(--live);border-color:var(--live);color:#06210f}
+.card.flash{animation:cardflash 1.3s ease}
+@keyframes livepulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--live) 60%,transparent)}70%{box-shadow:0 0 0 10px transparent}100%{box-shadow:0 0 0 0 transparent}}
+@keyframes livedraw{0%{stroke-dashoffset:60}55%{stroke-dashoffset:0}100%{stroke-dashoffset:-60}}
+@keyframes liveslide{0%{transform:translateX(-100%)}60%,100%{transform:translateX(100%)}}
+@keyframes liveshine{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes liveglow{0%,100%{box-shadow:0 0 0 0 transparent,0 14px 30px -18px color-mix(in srgb,var(--sc) 50%,transparent)}50%{box-shadow:0 0 0 3px color-mix(in srgb,var(--sc) 22%,transparent),0 18px 38px -14px color-mix(in srgb,var(--sc) 65%,transparent)}}
+@keyframes cardflash{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--gold) 70%,transparent)}40%{box-shadow:0 0 0 8px color-mix(in srgb,var(--gold) 35%,transparent)}100%{box-shadow:0 0 0 0 transparent}}
+@media (prefers-reduced-motion:reduce){.livedot,.nowbar::after,.card.working,.card.working::before,.card.flash{animation:none}.scribble path{animation:none;stroke-dashoffset:0}}
 </style>
 </head>
 <body>
@@ -510,6 +541,7 @@ function enqueue(op,msg){
 }
 function update(id,patch,msg){
   if(patch&&patch.stage!==undefined)delete ui.istage[id];
+  if(patch&&patch.stage===DONE){patch.working=false;patch.workSince=null;}
   var o=find(state.orders,id);if(o)Object.assign(o,patch);
   enqueue(function(d){var x=find(d.orders,id);if(x)Object.assign(x,patch);},msg||'อัปเดตงาน');
   render();
@@ -673,19 +705,79 @@ document.addEventListener('paste',function(e){
 });
 
 /* ---------- render ---------- */
+/* ---------- "working on it now": pinned to the top, animated ---------- */
+function isLive(o){return !!o.working&&o.stage!==DONE;}
+function workingOrder(){
+  for(var i=0;i<state.orders.length;i++)if(isLive(state.orders[i]))return state.orders[i];
+  return null;
+}
+function fmtSince(iso){
+  var d=new Date(iso);if(isNaN(d.getTime()))return '';
+  var hm=('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+' น.';
+  if(d.toDateString()===new Date().toDateString())return 'เริ่มทำเมื่อ '+hm;
+  var m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  return 'เริ่มทำเมื่อ '+d.getDate()+' '+m[d.getMonth()]+' '+hm;
+}
+function scribble(){
+  var s=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  s.setAttribute('viewBox','0 0 48 24');s.setAttribute('width','48');s.setAttribute('height','24');
+  s.setAttribute('class','scribble');s.setAttribute('aria-hidden','true');
+  s.innerHTML='<path pathLength="60" d="M3 15C8 3 14 3 18 12S28 21 33 9 41 6 45 12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>';
+  return s;
+}
+function nowBar(){
+  var o=workingOrder();if(!o)return null;
+  var b=el('button','nowbar');b.type='button';
+  b.setAttribute('aria-label','ชะเอมกำลังทำงาน '+o.code+' อยู่ตอนนี้ กดเพื่อดูงาน');
+  b.appendChild(el('span','livedot'));
+  var t=el('span','nowtxt');
+  t.appendChild(el('b',null,'ชะเอมกำลังทำอยู่ตอนนี้'));
+  t.appendChild(el('span',null,o.code+' · '+o.customer+(o.item?' · '+o.item:'')));
+  var since=o.workSince?fmtSince(o.workSince):'';
+  if(since)t.appendChild(el('span','since',since));
+  b.appendChild(t);
+  b.appendChild(scribble());
+  b.onclick=function(){
+    var c=document.getElementById('card-'+o.id);
+    if(!c){ui.tab='all';ui.stage=-1;ui.q='';render();c=document.getElementById('card-'+o.id);}
+    if(c){
+      c.scrollIntoView({behavior:'smooth',block:'center'});
+      c.classList.remove('flash');void c.offsetWidth;c.classList.add('flash');
+      setTimeout(function(){c.classList.remove('flash');},1400);
+    }
+  };
+  return b;
+}
+function setWorking(o,on){
+  var ts=new Date().toISOString();
+  function apply(x){
+    if(x.id===o.id){if(on){x.working=true;x.workSince=ts;}else{delete x.working;delete x.workSince;}}
+    else if(on&&x.working){delete x.working;delete x.workSince;}
+  }
+  state.orders.forEach(apply);
+  enqueue(function(d){d.orders.forEach(apply);},(on?'กำลังทำ ':'หยุดทำ ')+o.code);
+  render();
+  if(on){
+    window.scrollTo({top:0,behavior:'smooth'});
+    toast('ตั้ง '+o.code+' เป็นงานที่กำลังทำแล้ว ลูกค้าจะเห็นแถบ "กำลังทำอยู่" ด้านบนสุด');
+  }else toast('เลิกแสดง "กำลังทำอยู่" ของ '+o.code+' แล้ว');
+}
+
 function visible(){
   var q=ui.q.trim().toLowerCase();
-  return state.orders.filter(function(o){
+  var rows=state.orders.filter(function(o){
     if(ui.tab==='active'&&o.stage===DONE)return false;
     if(ui.tab==='done'&&o.stage!==DONE)return false;
     if(ui.stage>=0&&o.stage!==ui.stage)return false;
     if(q&&(o.code+' '+o.customer+' '+o.item).toLowerCase().indexOf(q)<0)return false;
     return true;
   });
+  return rows.sort(function(a,b){return (isLive(b)?1:0)-(isLive(a)?1:0);});
 }
 function render(){
   root.textContent='';
   root.appendChild(brandBar());
+  var nb=nowBar();if(nb)root.appendChild(nb);
   var active=state.orders.filter(function(o){return o.stage!==DONE;});
   var late=active.filter(function(o){return o.due&&o.due<todayStr();}).length;
   var wait=active.filter(function(o){return WAIT[o.stage];}).length;
@@ -907,10 +999,17 @@ function editForm(o){
 }
 
 function card(o){
-  var c=el('article','card s'+o.stage);
+  var live=isLive(o);
+  var c=el('article','card s'+o.stage+(live?' working':''));
+  c.id='card-'+o.id;
   if(gh.ok){c.setAttribute('data-pt',o.id);if(pasteTarget===o.id)c.classList.add('paste-on');}
   var fin=o.stage===DONE;
   var isLate=!fin&&o.due&&o.due<todayStr();
+  if(live){
+    var lb=el('div','livebadge');
+    lb.appendChild(el('span','livedot'));lb.appendChild(el('span',null,'กำลังทำอยู่ตอนนี้'));lb.appendChild(scribble());
+    c.appendChild(lb);
+  }
   var top=el('div','top');
   top.appendChild(el('span','code',o.code));
   top.appendChild(withIcon(el('span','pill',fin?'เสร็จแล้ว':'ตอนนี้: '+STAGES[o.stage]),fin?'checkc':STAGE_ICONS[o.stage],false,14));
@@ -966,6 +1065,12 @@ function card(o){
     c.appendChild(a);
 
     var tools=el('div','actions tools');
+    if(!fin){
+      var wk=el('button','btn nowbtn'+(live?' on':''),live?'หยุดทำงานนี้':'ตั้งเป็นงานที่กำลังทำ');
+      withIcon(wk,'activity',false,15);wk.type='button';
+      wk.onclick=function(){setWorking(o,!live);};
+      tools.appendChild(wk);
+    }
     var pick=el('div','stpick');
     pick.appendChild(el('span',null,'ใส่รูปของขั้น'));
     var sl=document.createElement('select');sl.setAttribute('aria-label','เลือกขั้นตอนที่จะใส่รูป');
