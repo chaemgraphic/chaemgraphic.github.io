@@ -9,15 +9,6 @@
    "stage": 3,
    "rev": 1,
    "example": true
-  },
-  {
-   "id": "ex2",
-   "code": "D-1042",
-   "customer": "ร้านบอล (ตัวอย่าง)",
-   "item": "ออกแบบเสื้อโปโลทีม",
-   "due": "2026-12-12",
-   "stage": 2,
-   "example": true
   }
  ]
 }
