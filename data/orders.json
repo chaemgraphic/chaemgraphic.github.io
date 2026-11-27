@@ -17,12 +17,13 @@
    "customer": "S.Priboon",
    "item": "",
    "due": "",
-   "stage": 1,
+   "stage": 2,
    "images": [
     "images/mwx3hs0rtsfu.jpg"
    ],
    "working": true,
-   "workSince": "2026-11-26T05:52:50.289Z"
+   "workSince": "2026-11-26T05:52:50.289Z",
+   "now": true
   }
  ]
 }
