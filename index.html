@@ -350,6 +350,17 @@ h1 .h-fill{background:linear-gradient(95deg,#ffc27a 0%,#e0613a 45%,#e9c98d 100%)
 .gh-row button{padding:10px 16px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);color:var(--fg);font:inherit;font-weight:600;cursor:pointer}
 .gh-row button.pri{background:#e0613a;border-color:#e0613a;color:#fff}
 .gh-err{color:var(--danger);font-size:.88rem;font-weight:600}
+/* ---- portfolio side tab ---- */
+.pf-tab{position:fixed;z-index:39;right:max(0px,env(safe-area-inset-right,0px));top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:12px;padding:20px 14px 22px;border-radius:22px 0 0 22px;background:linear-gradient(170deg,#ffb36b,#e0613a 55%,#b8452a);color:#1a1306;text-decoration:none;box-shadow:-10px 14px 34px -12px rgba(224,97,58,.7);font-family:var(--display);font-style:italic;font-weight:800}
+.pf-tab .pf-ic{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:#1a1306;color:#ffc27a}
+.pf-tab .pf-t{writing-mode:vertical-rl;font-size:1.35rem;letter-spacing:.04em;line-height:1}
+.pf-tab .pf-s{writing-mode:vertical-rl;font-size:.78rem;font-weight:600;font-style:normal;opacity:.8}
+.pf-tab:hover{padding-right:22px;filter:brightness(1.06)}
+.pf-tab:focus-visible{outline:3px solid var(--fg);outline-offset:3px}
+@media (prefers-reduced-motion:no-preference){.pf-tab{transition:padding .25s,filter .25s}.pf-tab .pf-ic{animation:pfpulse 2.4s ease-in-out infinite}}
+@keyframes pfpulse{0%,100%{box-shadow:0 0 0 0 rgba(26,19,6,.45)}50%{box-shadow:0 0 0 9px rgba(26,19,6,0)}}
+@media (max-width:760px){.pf-tab{top:auto;transform:none;bottom:calc(14px + env(safe-area-inset-bottom,0px));left:max(14px,env(safe-area-inset-left,0px));right:auto;flex-direction:row;gap:10px;padding:8px 18px 8px 8px;border-radius:999px}.pf-tab:hover{padding-right:18px}.pf-tab .pf-ic{width:40px;height:40px}.pf-tab .pf-t{writing-mode:horizontal-tb;font-size:1.1rem}.pf-tab .pf-s{display:none}}
+@media print{.pf-tab,.gh-key{display:none}}
 @media (max-width:480px){
   .hero{--hp:16px;padding:22px var(--hp) 0;border-radius:22px}
   .hero-head{grid-template-columns:minmax(0,1fr) 118px}
@@ -833,6 +844,10 @@ function addForm(){
 }
 
 
+/* ---------- portfolio side tab ---------- */
+(function(){var a=document.createElement('a');a.className='pf-tab';a.href='portfolio.html';a.setAttribute('aria-label','ดูหน้ารวมผลงาน');
+  a.innerHTML='<span class="pf-ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg></span><span class="pf-t">ดูผลงาน</span><span class="pf-s">PORTFOLIO</span>';
+  document.body.appendChild(a);})();
 /* ---------- GitHub Pages: data.json + edit with a token ---------- */
 (function(){
   var hm=location.hostname.match(/^([^.]+)\.github\.io$/i);
