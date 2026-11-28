@@ -617,6 +617,7 @@ function render(){
   var active=state.orders.filter(function(o){return o.stage!==DONE;});
   var late=active.filter(function(o){return o.due&&o.due<todayStr();}).length;
   var wait=active.filter(function(o){return WAIT[o.stage];}).length;
+  var CONFIRM=4,working=active.filter(function(o){return o.stage!==CONFIRM;}).length;
 
   /* hero */
   var hero=el('section','hero');
@@ -635,7 +636,7 @@ function render(){
   s.oninput=function(){ui.q=s.value;var pos=s.selectionStart;render();var n=document.getElementById('search');n.focus();n.setSelectionRange(pos,pos);};
   hero.appendChild(s);
   var stats=el('div','stats');
-  [[active.length,'กำลังทำ','','activity'],[wait,'รอลูกค้า','','clock'],[state.orders.length-active.length,'เสร็จแล้ว','','checkc'],[late,'เลยกำหนด',late?'warn':'','alert']].forEach(function(t,k){
+  [[working,'กำลังทำ','','activity'],[wait,'รอลูกค้า','','clock'],[state.orders.length-active.length,'เสร็จแล้ว','','checkc'],[late,'เลยกำหนด',late?'warn':'','alert']].forEach(function(t,k){
     var d=el('div','stat');d.style.setProperty('--sc',STAT_C[k]);d.appendChild(el('b',t[2],String(t[0])));d.appendChild(withIcon(el('span',null,t[1]),t[3],false,15));stats.appendChild(d);
   });
   hero.appendChild(stats);
