@@ -1,0 +1,32 @@
+{
+ "categories": [
+  {
+   "id": "c1",
+   "name": "เสื้อฟุตบอล"
+  },
+  {
+   "id": "c2",
+   "name": "เสื้อกีฬาอื่นๆ"
+  },
+  {
+   "id": "c3",
+   "name": "โลโก้ / แบรนด์"
+  },
+  {
+   "id": "c4",
+   "name": "กราฟิกเกม / ปกคลิป"
+  }
+ ],
+ "works": [
+  {
+   "id": "mwzy788r3xwe",
+   "title": "001",
+   "cat": "c1",
+   "note": "",
+   "images": [
+    "images/portfolio/mwzy788r3xwe-1.jpg"
+   ],
+   "date": "2026-11-28"
+  }
+ ]
+}
